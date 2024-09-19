@@ -1,0 +1,6 @@
+Jet Model,Max Speed (km/h),Altitude Limit (ft),Range (km),Fuel Capacity (liters),Flight Time (hours),Fuel Efficiency (km/liter),Jet Usage,Mission Compatibility
+F-16,2400,50000,2500,12000,3,5,Air-to-air combat,High
+F-18,1915,40000,2400,14000,3.5,4.5,Multirole fighter,Medium
+F-22,2410,65000,3000,11000,2.7,6,Stealth combat,Very High
+F-35,1975,45000,2200,13000,2.8,5.2,Stealth multirole,High
+Eurofighter Typhoon,2495,55000,2900,10000,2.5,6.5,Air superiority,High

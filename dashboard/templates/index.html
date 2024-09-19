@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fighter Jet Performance Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .chart-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #model-viewer {
+            width: 100%;
+            height: 400px;
+            background-color: #333;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <select id="jetSelector">
+        {% for model in jet_models %}
+            <option value="{{ model }}">{{ model }}</option>
+        {% endfor %}
+    </select>
+    <div id="model-viewer"></div>
+    <div class="dashboard">
+        <div class="chart-container" id="altitudeSpeedChart"></div>
+        <div class="chart-container" id="flightRangeChart"></div>
+        <div class="chart-container" id="usagePieChart"></div>
+        <div class="chart-container" id="radarChart"></div>
+    </div>
+    <div class="chart-container">
+        <table id="summaryTable"></table>
+    </div>
+
+    <script>
+        // Load charts
+        function loadCharts() {
+            fetch('/altitude_speed_chart')
+                .then(response => response.json())
+                .then(fig => Plotly.newPlot('altitudeSpeedChart', fig.data, fig.layout))
+                .catch(error => console.error('Error loading altitude-speed chart:', error));
+
+            fetch('/flight_range_chart')
+                .then(response => response.json())
+                .then(fig => Plotly.newPlot('flightRangeChart', fig.data, fig.layout))
+                .catch(error => console.error('Error loading flight-range chart:', error));
+
+            fetch('/usage_pie_chart')
+                .then(response => response.json())
+                .then(fig => Plotly.newPlot('usagePieChart', fig.data, fig.layout))
+                .catch(error => console.error('Error loading usage pie chart:', error));
+
+            fetch('/radar_chart')
+                .then(response => response.json())
+                .then(fig => Plotly.newPlot('radarChart', fig.data, fig.layout))
+                .catch(error => console.error('Error loading radar chart:', error));
+        }
+
+        // Load 3D model
+        function load3DModel(jetModel) {
+            fetch(`/get_3d_model/${jetModel}`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('model-viewer');
+                    container.innerHTML = '';  // Clear the container
+
+                    if (data.error) {
+                        container.innerHTML = `<p style="color: red;">3D Model not found for ${jetModel}</p>`;
+                        return;
+                    }
+
+                    const scene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                    const renderer = new THREE.WebGLRenderer();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                    container.appendChild(renderer.domElement);
+
+                    const geometry = new THREE.BufferGeometry();
+                    geometry.setAttribute('position', new THREE.Float32BufferAttribute(data.vertices.flat(), 3));
+                    geometry.setIndex(data.faces.flat());
+                    geometry.computeVertexNormals();
+
+                    const material = new THREE.MeshPhongMaterial({ color: 0x808080, flatShading: true });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+
+                    const ambientLight = new THREE.AmbientLight(0x404040);
+                    scene.add(ambientLight);
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                    directionalLight.position.set(1, 1, 1);
+                    scene.add(directionalLight);
+
+                    const boundingBox = new THREE.Box3().setFromObject(mesh);
+                    const center = boundingBox.getCenter(new THREE.Vector3());
+                    const size = boundingBox.getSize(new THREE.Vector3());
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const fov = camera.fov * (Math.PI / 180);
+                    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+                    cameraZ *= 1.5;
+
+                    camera.position.set(center.x, center.y, center.z + cameraZ);
+                    camera.lookAt(center);
+
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.update();
+
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        controls.update();
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+
+                    window.addEventListener('resize', () => {
+                        renderer.setSize(container.clientWidth, container.clientHeight);
+                        camera.aspect = container.clientWidth / container.clientHeight;
+                        camera.updateProjectionMatrix();
+                    });
+                })
+                .catch(error => console.error('Error loading 3D model:', error));
+        }
+
+        // Load summary table
+        function loadSummaryTable() {
+            fetch('/get_jet_data')
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('summaryTable');
+                    const headerRow = `<tr>
+                        <th>Jet Model</th>
+                        <th>Max Speed (km/h)</th>
+                        <th>Altitude Limit (ft)</th>
+                        <th>Range (km)</th>
+                        <th>Fuel Capacity (liters)</th>
+                        <th>Flight Time (hours)</th>
+                        <th>Fuel Efficiency (km/liter)</th>
+                        <th>Jet Usage</th>
+                    </tr>`;
+                    table.innerHTML = headerRow;
+                    data.forEach(jet => {
+                        const row = `<tr>
+                            <td>${jet['Jet Model']}</td>
+                            <td>${jet['Max Speed (km/h)']}</td>
+                            <td>${jet['Altitude Limit (ft)']}</td>
+                            <td>${jet['Range (km)']}</td>
+                            <td>${jet['Fuel Capacity (liters)']}</td>
+                            <td>${jet['Flight Time (hours)']}</td>
+                            <td>${jet['Fuel Efficiency (km/liter)']}</td>
+                            <td>${jet['Jet Usage']}</td>
+                        </tr>`;
+                        table.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Error loading jet data:', error));
+        }
+
+        // Initialize
+        window.onload = function() {
+            loadCharts();
+            loadSummaryTable();
+            load3DModel(document.getElementById('jetSelector').value);
+        };
+
+        // On change of jet selection
+        document.getElementById('jetSelector').addEventListener('change', function() {
+            load3DModel(this.value);
+        });
+    </script>
+</body>
+</html>
