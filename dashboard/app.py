@@ -1,16 +1,14 @@
 import os
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.utils
 import json
-import trimesh
-from urllib.parse import unquote
 
 app = Flask(__name__)
 
 # Load the jet data
-jet_data = pd.read_csv('jet_data.csv')
+jet_data = pd.read_csv('/home/puurrii/Documents/fighterjet/dashboard/jet_data.csv')
 
 @app.route('/')
 def index():
@@ -64,32 +62,10 @@ def radar_chart():
     fig.update_layout(polar=dict(radialaxis=dict(visible=True)), showlegend=True, title='Jet Performance Comparison')
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-@app.route('/get_3d_model/<jet_model>')
-def get_3d_model(jet_model):
-    jet_model = unquote(jet_model)
-    # Construct the file path
-    model_path = os.path.join('models', f'{jet_model}.glb')
-    print(f"Looking for model at: {model_path}")
+@app.route('/models/<path:filename>')
+def serve_model(filename):
+    # Serve files from the models directory
+    return send_from_directory('models', filename)
 
-    # Check if the file exists
-    if not os.path.exists(model_path):
-        return jsonify({'error': 'Model not found'}), 404
-    
-    # Load the GLB file
-    try:
-        mesh = trimesh.load(model_path)
-        
-        # Extract vertices and faces
-        vertices = mesh.vertices.tolist()
-        faces = mesh.faces.tolist()
-        
-        return jsonify({
-            'vertices': vertices,
-            'faces': faces
-        })
-    except Exception as e:
-        print(f"Error loading model: {str(e)}")  # Log the error
-        return jsonify({'error': str(e)}), 500
-    
 if __name__ == '__main__':
     app.run(debug=True)

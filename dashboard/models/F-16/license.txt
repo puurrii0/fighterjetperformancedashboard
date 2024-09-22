@@ -1,0 +1,11 @@
+Model Information:
+* title:	General Dynamics F-16 - Falcon
+* source:	https://sketchfab.com/3d-models/general-dynamics-f-16-falcon-b04a44ae7e804129ae5f0eb95f9cdf83
+* author:	karelkiers (https://sketchfab.com/karelkiers)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "General Dynamics F-16 - Falcon" (https://sketchfab.com/3d-models/general-dynamics-f-16-falcon-b04a44ae7e804129ae5f0eb95f9cdf83) by karelkiers (https://sketchfab.com/karelkiers) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

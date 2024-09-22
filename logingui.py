@@ -1,6 +1,8 @@
 import tkinter as tk
 import webbrowser
 from PIL import Image, ImageTk
+import time
+import subprocess
 
 class LoginDashboard(tk.Tk):
     def __init__(self):
@@ -20,7 +22,7 @@ class LoginDashboard(tk.Tk):
             print(f"Error loading background image: {e}")
             self.bg_photo = None
 
-        # Create canvas for background
+
         self.canvas = tk.Canvas(self, width=self.screen_width, height=self.screen_height)
         self.canvas.pack(fill="both", expand=True)
         if self.bg_photo:
@@ -33,10 +35,9 @@ class LoginDashboard(tk.Tk):
         rect_x2 = rect_x1 + rect_width
         rect_y2 = rect_y1 + rect_height
 
-        # Create centered semi-transparent blue login area
+
         self.canvas.create_rectangle(rect_x1, rect_y1, rect_x2, rect_y2, fill="light blue", stipple="gray25")
 
-        # Add login elements
         self.canvas.create_text(self.screen_width / 2, rect_y1 + 30, text="Login Dashboard", font=("undefined", 16, "bold"), fill="black")
 
         self.canvas.create_text(self.screen_width / 2 - 90, rect_y1 + 80, text="Username:", anchor="w", font=("undefined", 12), fill="black")
@@ -58,7 +59,9 @@ class LoginDashboard(tk.Tk):
         password = self.password_entry.get()
 
         if username == correct_username and password == correct_password:
-            webbrowser.open("./dashboard/index.html")
+            subprocess.Popen(["python", "./dashboard/app.py"])
+            time.sleep(2)
+            webbrowser.open("http://127.0.0.1:5000")
         else:
             print("Incorrect username or password")
 

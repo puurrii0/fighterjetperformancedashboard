@@ -1,0 +1,11 @@
+Model Information:
+* title:	F-18 Hornet
+* source:	https://sketchfab.com/3d-models/f-18-hornet-fc149b4afccd4b64b816e91dc3181de4
+* author:	Jonathan Geoffroy (https://sketchfab.com/jonathangeoffroy)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "F-18 Hornet" (https://sketchfab.com/3d-models/f-18-hornet-fc149b4afccd4b64b816e91dc3181de4) by Jonathan Geoffroy (https://sketchfab.com/jonathangeoffroy) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

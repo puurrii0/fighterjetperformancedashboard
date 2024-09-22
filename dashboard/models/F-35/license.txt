@@ -1,0 +1,11 @@
+Model Information:
+* title:	F35
+* source:	https://sketchfab.com/3d-models/f35-7ed2ab6c50f14dcb8d30c6b3b226ec8a
+* author:	yusuffahriev (https://sketchfab.com/yusuffahriev)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "F35" (https://sketchfab.com/3d-models/f35-7ed2ab6c50f14dcb8d30c6b3b226ec8a) by yusuffahriev (https://sketchfab.com/yusuffahriev) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
